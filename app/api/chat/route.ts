@@ -53,4 +53,4 @@ Please answer the question based only on the information provided in the transcr
     console.error('Error in chat:', error);
     return NextResponse.json({ error: 'Failed to process your question' }, { status: 500 });
   }
-} 
+}
