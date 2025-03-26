@@ -3,5 +3,6 @@ cd youtube-transcript-extractor
 npm install youtube-transcript axios
 npm install -D tailwindcss postcss autoprefixer
 npm install firebase
+npm install youtubei.js
 npx tailwindcss init -p 
 npm run dev 

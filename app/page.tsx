@@ -65,7 +65,11 @@ export default function Home() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to extract transcript');
+        if (response.status === 404) {
+          throw new Error('No transcript available for this video. Try a different video or check if captions are enabled.');
+        } else {
+          throw new Error(data.error || 'Failed to extract transcript');
+        }
       }
       
       setTranscript(data.transcript);

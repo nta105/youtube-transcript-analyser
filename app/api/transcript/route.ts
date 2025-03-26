@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { YoutubeTranscript } from 'youtube-transcript';
+import { Innertube } from 'youtubei.js/web';
 
 // Function to extract video ID from YouTube URL
 function extractVideoId(url: string): string | null {
@@ -22,8 +22,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
     }
     
-    // Fetch transcript using youtube-transcript library
-    const transcript = await YoutubeTranscript.fetchTranscript(videoId);
+    // Initialize Innertube
+    const youtube = await Innertube.create({
+      lang: 'en',
+      location: 'US',
+      retrieve_player: false,
+    });
+    
+    // Get video info
+    const info = await youtube.getInfo(videoId);
+    
+    // Fetch transcript
+    let transcript = [];
+    
+    try {
+      const transcriptData = await info.getTranscript();
+      
+      if (!transcriptData || !transcriptData.transcript || !transcriptData.transcript.content || !transcriptData.transcript.content.body) {
+        throw new Error('Transcript data is not in expected format');
+      }
+      
+      // Map the transcript segments to the format expected by the app
+      transcript = transcriptData.transcript.content.body.initial_segments.map((segment: any) => ({
+        text: segment.snippet.text,
+        start: segment.start_ms / 1000, // Convert ms to seconds
+        duration: (segment.end_ms - segment.start_ms) / 1000 // Calculate duration in seconds
+      }));
+    } catch (transcriptError) {
+      console.error('Error fetching transcript:', transcriptError);
+      return NextResponse.json({ error: 'No transcript available for this video' }, { status: 404 });
+    }
     
     if (transcript && transcript.length > 0) {
       return NextResponse.json({ 

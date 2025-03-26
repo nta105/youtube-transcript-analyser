@@ -59,6 +59,9 @@ const YouTubeInput: React.FC<YouTubeInputProps> = ({ onSubmit, isLoading }) => {
             disabled={isLoading}
           />
         </div>
+        <p className="text-xs text-gray-400 mt-1">
+          Note: Only videos with captions/subtitles will have transcripts available.
+        </p>
         {error && <p className="text-sm text-red-500">{error}</p>}
         <button
           type="submit"
